@@ -5,13 +5,65 @@
 #include <unordered_map>
 #include <climits>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
 static const ll INFINITO = (1LL << 60);
 
+void exibirMatrizDistancias(const Grafo& grafo) {
+    int n = grafo.quantidadeVertices;
+    vector<vector<ll>> dist(n + 1, vector<ll>(n + 1, INFINITO));
+    
+    for (int i = 1; i <= n; i++) {
+        dist[i][i] = 0;
+    }
+    
+    for (const auto& a : grafo.arestas) {
+        if (dist[a.origem][a.destino] > a.custo) {
+            dist[a.origem][a.destino] = a.custo;
+            dist[a.destino][a.origem] = a.custo;
+        }
+    }
+    
+    for (int k = 1; k <= n; k++) {
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (dist[i][k] != INFINITO && dist[k][j] != INFINITO) {
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+    
+    cout << "\n=== MATRIZ DE DISTANCIAS MINIMAS ===\n\n";
+    cout << "     ";
+    for (int j = 1; j <= n; j++) {
+        cout << setw(6) << j;
+    }
+    cout << "\n     ";
+    for (int j = 1; j <= n; j++) {
+        cout << "------";
+    }
+    cout << "\n";
+    
+    for (int i = 1; i <= n; i++) {
+        cout << setw(3) << i << " |";
+        for (int j = 1; j <= n; j++) {
+            if (dist[i][j] == INFINITO) {
+                cout << setw(6) << "INF";
+            } else {
+                cout << setw(6) << dist[i][j];
+            }
+        }
+        cout << "\n";
+    }
+}
+
 void CarteiroChines::resolver(const Grafo& grafo) {
     int n = grafo.quantidadeVertices;
+
+    exibirMatrizDistancias(grafo); 
 
     ll custoOriginal = 0;
     for (const auto& a : grafo.arestas) {
